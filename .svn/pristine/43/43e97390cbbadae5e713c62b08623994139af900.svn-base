@@ -1,0 +1,40 @@
+<template>
+    <el-row>
+        <el-col :span="24">
+            <h3><p class="tc">株洲市饲料和饲料添加剂生产企业花名册</p></h3>
+            <el-table :data="tableData" v-loading="loading" stripe border ref="table">
+                <el-table-column type="index" width="60"></el-table-column>
+                <el-table-column prop="name" label="单位名称" width="250" sortable></el-table-column>
+                <el-table-column prop="category" label="企业类型" width="100" sortable></el-table-column>
+                <el-table-column prop="responsPerson" label="负责人" width="80"></el-table-column>
+                <el-table-column prop="address" label="通讯地址" sortable></el-table-column>
+                <el-table-column prop="phone" label="联系人及电话"></el-table-column>
+                <el-table-column prop="zipCode" label="邮编" width="80" sortable></el-table-column>
+            </el-table>
+        </el-col>
+    </el-row>
+</template>
+
+<script>
+import { getList } from 'src/service/feed'
+
+export default {
+    data() {
+        return {
+            pid:this.$route.params.id,
+            loading: false, //列表load
+            tableData: [], //表格数据
+        }
+    },
+    created() {
+        this.initData();
+    },
+    methods: {
+        async initData() {
+            this.loading = true;
+            this.tableData = await getList();
+            this.loading = false;
+        }
+    }
+}
+</script>

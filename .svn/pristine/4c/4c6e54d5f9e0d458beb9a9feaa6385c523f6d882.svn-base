@@ -1,0 +1,41 @@
+<template>
+    <el-row>
+        <el-col :span="24">
+            <h3><p class="tc">疫情报告</p></h3>
+            <el-table :data="tableData" v-loading="loading" stripe border ref="table">
+                <el-table-column type="index" width="60"></el-table-column>
+                <el-table-column prop="name" label="养殖场" width="250" sortable></el-table-column>
+                <el-table-column prop="category" label="发病时间" width="100"></el-table-column>
+                <el-table-column prop="responsPerson" label="畜禽种类" width="80"></el-table-column>
+                <el-table-column prop="address" label="存栏数" sortable></el-table-column>
+                <el-table-column prop="phone" label="发病数（头/天）"></el-table-column>
+                <el-table-column prop="phone" label="死亡数（头/天）"></el-table-column>
+                <el-table-column prop="phone" label="核实情况"></el-table-column>
+                <el-table-column prop="phone" label="备注"></el-table-column>
+            </el-table>
+        </el-col>
+    </el-row>
+</template>
+
+<script>
+import { getList } from 'src/service/feed'
+
+export default {
+    data() {
+        return {
+            loading: false, //列表load
+            tableData: [], //表格数据
+        }
+    },
+    created() {
+        this.initData();
+    },
+    methods: {
+        async initData() {
+            this.loading = true;
+            // this.tableData = await getList();
+            this.loading = false;
+        }
+    }
+}
+</script>

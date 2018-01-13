@@ -1,0 +1,116 @@
+<template>
+    <el-row>
+        <el-col :span="24" class="toolbar">
+            <el-button type="primary" icon="plus" @click="handleAdd()">新增</el-button>
+        </el-col>
+        <el-col :span="24">
+            <el-table :data="tableData" v-loading="loading" stripe border ref="table">
+                <el-table-column type="index" width="60"></el-table-column>
+                <el-table-column prop="fileName" label="名称">
+                      <template scope="scope">
+                        <router-link :to="{ path:scope.row.url, query: { type: 2 }}" class="a-title">{{scope.row.fileName}}</router-link>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="createTime" label="上传时间" width="150">
+                    <template scope="scope">{{scope.row.createTime | date}}</template>
+                </el-table-column>
+                <el-table-column label="操作" width="300">
+                    <template scope="scope">
+                        <el-button size="small" icon="download" @click="DOWNLOAD_FILE(scope.row.fileName)">下载</el-button>
+                        <el-button size="small" icon="edit" @click="handleEdit(scope.row)">编辑</el-button>
+                        <el-button type="danger" icon="delete" size="small" @click="handleDel(scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-col>
+        <el-dialog title="新增菜单" v-model="addVisible">
+            <edit @success="handleSaveSuccess" :model="editModel" v-if="addVisible"></edit>
+        </el-dialog>
+        <el-dialog title="修改菜单" v-model="editVisible">
+            <edit @success="handleSaveSuccess" :model="editModel" v-if="editVisible"></edit>
+        </el-dialog>
+    </el-row>
+</template>
+
+<script>
+import { mapActions,mapMutations } from 'vuex'
+import { getListPage, batchRemove } from 'src/service/pdf'
+import edit from './edit'
+
+export default {
+    components: { edit },
+    data() {
+        return {
+            pid:this.$route.params.id,
+            loading: false, //列表load
+            tableData: [], //表格数据
+            addVisible: false,
+            editVisible: false,
+            editModel: null, //编辑数据
+        }
+    },
+    watch:{
+        $route(){
+            this.pid = this.$route.params.id,
+            this.initData();
+        }
+    },
+    created() {
+        this.initData();
+    },
+    methods: {
+        ...mapMutations([
+            'DOWNLOAD_FILE'
+        ]),
+        //时间格式化  
+        dateFormat:function(row, column) {  
+            return formatDate(new Date(+row[column.property]),'yyyy-MM-dd')
+        },
+        async initData() {
+            this.loading = true;
+            this.tableData = await getListPage({ id:this.pid, page:1, pageSize:100 });
+            this.loading = false;
+        },
+        handleAdd(row) {
+            this.editModel = {
+                id: '',
+                pids: row ? [...row.pids, row.id] : [],
+                name: '',
+                url: '',
+                icon: '',
+                disable: 'no',
+                order: '',
+                remark: '',
+            }
+            this.addVisible = true;
+        },
+        handleEdit(row) {
+            this.editModel = { ...row, disable: row.disable || 'no' };
+            this.editVisible = true;
+        },
+        handleSaveSuccess() {
+            this.addVisible = false;
+            this.editVisible = false;
+            this.initData();
+        },
+        async handleDel(row) {
+            await this.$confirm('确认删除吗？', '提示');
+            await batchRemove({ ids: [row.id] });
+            this.$message.success('删除成功');
+            this.initData();
+        },
+        //删除多个
+        async batchRemove() {
+            const ids = this.sels.map(v => v.id);
+            if (ids.length > 0) {
+                await this.$confirm('确认删除吗？', '提示');
+                await batchRemove({ ids });
+                this.$message.success('删除成功');
+                this.initData();
+            } else {
+                this.$message.warning('请选择需要删除的数据');
+            }
+        }
+    }
+}
+</script>

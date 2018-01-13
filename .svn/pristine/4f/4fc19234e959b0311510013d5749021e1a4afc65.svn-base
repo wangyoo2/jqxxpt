@@ -1,0 +1,120 @@
+<template>
+  <el-table
+    :data="tableData3"
+    height="250"
+    border
+    style="width: 100%">
+    <el-table-column
+      prop="name"
+      label="单位名称"
+      width="180">
+    </el-table-column>
+    <el-table-column
+      prop="category"
+      label="企业类型"
+      width="180">
+    </el-table-column>
+    <el-table-column
+      prop="responsPerson"
+      label="负责人">
+    </el-table-column>
+    <el-table-column
+      prop="address"
+      label="通讯地址">
+    </el-table-column>
+    <el-table-column
+      prop="phone"
+      label="联系人及电话">
+    </el-table-column>
+    <el-table-column
+      prop="zipCode"
+      label="邮编">
+    </el-table-column>
+  </el-table>
+</template>
+
+<script>
+import { mapState, mapActions } from 'vuex'
+import { getList } from 'src/service/feed'
+import edit from './edit'
+
+export default {
+    components: { edit },
+    data() {
+        return {
+            pid:this.$route.params.id,
+            loading: false, //列表load
+            page: 1,
+            pageSize: 100,
+            pageSizes: [10, 20, 30, 50, 100],
+            total: 88,
+            tableData: [], //表格数据
+            sels: [],
+            addVisible: false,
+            editVisible: false,
+            editModel: null, //编辑数据
+        }
+    },
+    created() {
+        this.initData();
+    },
+    methods: {
+        selsChange: function(sels) {
+            this.sels = sels;
+        },
+        async initData() {
+            this.loading = true;
+            let { page, pageSize } = this;
+            // let { total, resultList } = await getListPage({ id:this.pid, page, pageSize });
+            // this.total = total;
+            // this.tableData = resultList;
+            this.tableData = await getList();
+            this.loading = false;
+        },
+        resetSearch() {
+            this.$refs.search.resetFields();
+            this.initData();
+        },
+        handleAdd(row) {
+            this.editModel = {
+                id: '',
+                pids: row ? [...row.pids, row.id] : [],
+                name: '',
+                url: '',
+                icon: '',
+                disable: 'no',
+                order: '',
+                remark: '',
+            }
+            this.addVisible = true;
+        },
+        handleEdit(row) {
+            this.editModel = { ...row, disable: row.disable || 'no' };
+            this.editVisible = true;
+        },
+        handleSaveSuccess() {
+            this.addVisible = false;
+            this.editVisible = false;
+            this.initData();
+        },
+        async handleDel(row) {
+            await this.$confirm('确认删除吗？', '提示');
+            await batchRemove({ ids: [row.id] });
+            this.$message.success('删除成功');
+            this.initData();
+        },
+        //删除多个
+        async batchRemove() {
+            const ids = this.sels.map(v => v.id);
+            if (ids.length > 0) {
+                await this.$confirm('确认删除吗？', '提示');
+                await batchRemove({ ids });
+                this.$message.success('删除成功');
+                this.initData();
+            } else {
+                this.$message.warning('请选择需要删除的数据');
+            }
+        }
+    }
+}
+</script>

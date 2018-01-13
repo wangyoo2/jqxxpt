@@ -1,0 +1,79 @@
+// base by fungleo
+body {
+  color: $c00;
+  font-weight: 400;
+  line-height: 1.5;
+  font-family: $font-family-base;
+  font-size: 18px;
+}
+*{
+  box-sizing: border-box;
+}
+
+.block {
+  display: block;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.none {
+  display: none
+}
+
+.clear {
+  clear: both;
+}
+
+.mb20 {
+  margin-bottom: 20px;
+}
+
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+.tl {
+  text-align: left;
+}
+
+.tr {
+  text-align: right;
+}
+
+.tc {
+  text-align: center;
+}
+
+.cf {
+  zoom: 1;
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+.w-100 {
+  width: 100%;
+}
+
+
+.c-search {}
+
+.a-title{
+  color:#4BA700!important;
+  text-decoration: none;
+}

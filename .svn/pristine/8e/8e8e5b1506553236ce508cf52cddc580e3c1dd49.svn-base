@@ -1,0 +1,94 @@
+<template>
+    <el-row>
+        <el-col :span="24">
+            <h3><p class="tc">湖南省株洲市畜牧基本生产数据</p></h3>
+            <el-form :inline="true" :model="search" @submit.prevent="initData" ref="search">
+                <el-form-item label="企业名称" prop="name">
+                    <el-input v-model="search.name"></el-input>
+                </el-form-item>
+                <el-form-item label="下辖区县" prop="area">
+                    <el-select v-model="search.area" placeholder="请选择">
+                        <el-option v-for="item in options" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="类型" prop="area">
+                    <el-select v-model="search.type" placeholder="请选择">
+                        <el-option v-for="item in options2" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="initData">查询</el-button>
+                    <el-button type="primary" @click="resetSearch">清除查询</el-button>
+                </el-form-item>
+            </el-form>
+            <el-table :data="tableData" v-loading="loading" stripe border ref="table">
+                <el-table-column type="index"></el-table-column>
+                <el-table-column prop="name" label="养殖场名称"></el-table-column>
+                <el-table-column prop="category" label="地址"></el-table-column>
+                <el-table-column prop="responsPerson" label="户主姓名"></el-table-column>
+                <el-table-column prop="address" label="联系电话"></el-table-column>
+                <el-table-column prop="phone" label="存栏数">
+                    <el-table-column prop="phone" label="存栏母畜"></el-table-column>
+                    <el-table-column prop="phone" label="年存栏数"></el-table-column>
+                </el-table-column>
+                <el-table-column prop="phone" label="年出栏数"></el-table-column>
+                <el-table-column prop="phone" label="是否已完成污染治理设施改造"></el-table-column>
+                <el-table-column prop="phone" label="其    中">
+                    <el-table-column prop="phone" label="废弃物贮存处理设施"></el-table-column>
+                    <el-table-column prop="phone" label="雨污分流、干湿分离设施"></el-table-column>
+                    <el-table-column prop="phone" label="粪污处理处置模式"></el-table-column>
+                </el-table-column>
+                <el-table-column prop="phone" label="化尸池容积（m³）"></el-table-column>
+                <el-table-column prop="phone" label="沼气池容积（m³）"></el-table-column>
+                <el-table-column prop="phone" label="沉淀池容积（m³）"></el-table-column>
+                <el-table-column prop="phone" label="生化塘容积（m³）"></el-table-column>
+                <el-table-column prop="phone" label="配套种植面积（亩）"></el-table-column>
+                <el-table-column prop="phone" label="是否环保备案或通过环评"></el-table-column>
+                <el-table-column prop="phone" label="禁、限养情况"></el-table-column>
+            </el-table>
+        </el-col>
+        <!-- <el-col :span="24" class="toolbar">
+            <el-pagination @size-change="pageSize=$event;initData()" @current-change="initData" layout="sizes,prev, pager, next" :current-page.sync="page" :page-size="pageSize" :total="total" class="fr"></el-pagination>
+        </el-col> -->
+    </el-row>
+</template>
+
+<script>
+import { getList } from 'src/service/feed'
+
+export default {
+    data() {
+        return {
+            loading: false, //列表load
+            page: 1,
+            pageSize: 10,
+            pageSizes: [5,20, 30, 50, 100],
+            total: 88,
+            tableData: [], //表格数据
+            options:['株洲市','株洲县','醴陵市','茶陵县','攸县','炎陵县'],
+            options2:['肉牛','肉羊','肉鸡','蛋鸡','鸭','鹅','鹌鹑'],
+            search: {
+                name: '',
+                area:'',
+                type:''
+            }
+        }
+    },
+    created() {
+        this.initData();
+    },
+    methods: {
+        async initData() {
+            this.loading = true;
+            let { page, pageSize } = this;
+            let {name,area,type} = this.search;
+            this.tableData = await getList({name,area,type});
+            this.loading = false;
+        },
+        resetSearch() {
+            this.$refs.search.resetFields();
+            this.initData();
+        },
+    }
+}
+</script>
